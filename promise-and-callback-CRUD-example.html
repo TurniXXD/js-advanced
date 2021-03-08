@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+
+  <style>
+    #posts li {
+      display: block;
+      border: 1px black solid;
+      margin: 5px;
+      text-align: center;
+    }
+    #posts li:hover {
+      cursor: pointer;
+      border: 3px black solid;
+    }
+    #editor {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <ul id="posts"></ul>
+  <div id="editor">
+    <input id="post-title-input" type="text" placeholder="Title of your post">
+    <input id="post-color-input" type="color"> <br>
+    <textarea name="" id="post-text-input" cols="50" rows="30" placeholder="Post's content"></textarea>
+    <button id="remove-post-editor">Remove post</button>
+    <button id="update-post-editor">Update post</button>
+    <button id="add-post-editor">Add new post</button>
+  </div>
+  <button id="add-post-button">Add post</button>
+  <script>
+    // callback example with CRUD
+    const posts = [
+      {title: "Good stocks", text: "GME, AAPL, AMZN"},
+      {title: "Bad stocks", text: "BA, ABNB, TSLA"}
+    ]
+    postsUl = document.getElementById('posts')
+    editor = document.getElementById('editor')
+    editorTitle = document.getElementById('post-title-input')
+    editorText = document.getElementById('post-text-input')
+    editorColor = document.getElementById('post-color-input')
+    addNewPost = document.getElementById('add-post-editor')
+    updatePost = document.getElementById('update-post-editor')
+    removePost = document.getElementById('remove-post-editor')
+    addPostButton = document.getElementById('add-post-button')
+
+    const getPosts = () => {
+      let output = ''
+      posts.forEach((post) => {
+        output += `<li class="post-li">
+                    <h2 class="post-title">${post.title}</h2>
+                    <p class="post-text">${post.text}</p>
+                   </li>`
+      });
+      postsUl.innerHTML = output;
+    }
+
+    getPosts()
+
+    /*     // using callback
+    const createPost = (post, callback) => {
+      posts.push(post);
+      callback();
+    } 
+    
+    createPost({title: 'Crypto? why not', text: 'Investing in crypto is easy and good for long term perspective'}, getPosts);
+*/
+
+    // using promise
+    const createPost = (post, callback) => {
+      return new Promise((resolve, reject) => {
+        posts.push(post);
+        resolve()
+        reject(new Error("Error: Something went wrong"))
+      })
+    }
+
+    postLi = document.getElementsByClassName('post-li')
+    postTitle = document.getElementsByClassName('post-title')
+    postText = document.getElementsByClassName('post-text')
+
+    Array.from(postLi).forEach((item) => {
+    	item.addEventListener('click', (event) => {
+        editor.style.display = "block"
+        for (let i = 0; i < postLi.length; i++){
+          postLi[i].style.border = "1px solid black"
+          postLi[i].style.background = "none"
+        }          
+        item.style.border = "3px solid green"
+        item.style.background = "lightGreen"
+        editorTitle.removeAttribute("placeholder")
+        editorText.removeAttribute("placeholder")
+        console.log(item.children[0].textContent)
+        editorTitle.value = item.children[0].textContent
+        editorText.value = item.children[1].textContent
+    	});
+    });
+
+    addPostButton.addEventListener('click', (event) => {
+        editor.style.display = "block"
+        addPostButton.style.display = "none"
+        updatePost.style.display = "none"
+    });
+
+    addNewPost.addEventListener('click', (event) => {
+      createPost({title: editorTitle.value, text: editorText.value})
+      .then(getPosts)
+      .catch(err => console.log(err));
+      editor.style.display = "none"
+      addPostButton.style.display = "block"
+    });
+
+    updatePost.addEventListener('click', (event) => {
+      createPost({title: editorTitle.value, text: editorText.value})
+      .then(getPosts)
+      .catch(err => console.log(err));
+      editor.style.display = "none"
+      addPostButton.style.display = "block"
+    });
+
+    removePost.addEventListener('click', (event) => {
+      createPost({title: editorTitle.value, text: editorText.value})
+      .then(getPosts)
+      .catch(err => console.log(err));
+      editor.style.display = "none"
+      addPostButton.style.display = "block"
+    });
+    
+  </script>
+</body>
+</html>
